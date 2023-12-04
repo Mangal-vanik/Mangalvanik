@@ -1,0 +1,34 @@
+version: '3.1'
+services:
+  danimai:
+    env_file:
+      - .env
+    build: .
+    container_name: ${APP_SLUG}_app
+    volumes:
+      - .:/src/usr/app
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+    networks:
+      - danimai_network
+    depends_on:
+      - mongo
+    command: npm run start:dev
+
+  mongo:
+    container_name: ${APP_SLUG}_mongo
+    image: mongo:latest
+    networks:
+      - danimai_network
+    ports:
+      - ${DATABASE_PORT}:27017
+    restart: always
+    volumes:
+      - ./data/db:/etc/mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+
+networks:
+  danimai_network:
+    driver: bridge
